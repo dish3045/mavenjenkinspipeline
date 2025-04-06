@@ -1,10 +1,5 @@
 pipeline {
     agent any  // Use any available agent
-    
-    environment {
-        LANG = 'en_US.UTF-8'
-        LC_ALL = 'en_US.UTF-8'
-    }
 
     tools {
         maven 'Maven'  // Ensure this matches the name configured in Jenkins
@@ -22,27 +17,23 @@ pipeline {
             }
         }
 
-     stage('Archive') {
+        stage('Test') {
             steps {
-                archiveArtifacts artifacts: 'target/*.war', fingerprint:true
-            }
-        }
-        stage('Deploy') {
-            steps {
-               sh 'mvn clean package'  
-               // ansiblePlaybook playbook:'ansible/playbook.yml', inventory:'ansible/hosts.ini'
-              // ansible-playbook ansible/playbook.yml -i ansible/hosts.ini
-              //ansiblePlaybook(
-                       // playbook: 'playbook.yml',
-                       // inventory: 'hosts.ini',
-                       // become: true
-                   // )
-                   // sh 'ansible-playbook ansible/playbook.yml -i ansible/hosts.ini -b --become-user root'
-                   sh 'ansible-playbook ansible/playbook.yml -i ansible/hosts.ini'
+                sh 'mvn test'  // Run unit tests
             }
         }
 
-                  
+        
+        
+       
+        stage('Run Application') {
+            steps {
+                // Start the JAR application
+                sh 'java -jar target/MyMavendisha-1.0-SNAPSHOT.jar'
+            }
+        }
+
+        
     }
 
     post {
